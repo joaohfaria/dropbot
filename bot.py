@@ -3,20 +3,40 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-MODELOS = ["AK-47", "M4A1", "AWP", "Pistolas", "Facas", "Luvas"]
+
+MODELS = [
+    {"model": "AK-47", "value": 270},
+    {"model": "M4A1", "value": 310},
+    {"model": "AWP", "value": 475},
+    {"model": "Pistol", "value": 300},
+    {"model": "Knife", "value": 300},
+    {"model": "Gloves", "value": 100}
+]
+
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
+
 intents = discord.Intents.default()
 intents.message_content = True
+
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
+text = ""
+counter = 1
+
+
+for modelo in MODELS:
+    text += f"{counter}. {modelo['model']}, Value: {modelo['value']}\n"
+    counter += 1
+
+
 @bot.event
 async def on_ready():
-    print(f"{bot.user} está online!")
+    print(f"{bot.user} It's online!")
 
 
 @bot.command()
@@ -26,33 +46,28 @@ async def ping(ctx):
 
 @bot.command()
 async def salve(ctx):
-    await ctx.send(f"Salve, {ctx.author.mention}!")
+    await ctx.send(f"Hey there, {ctx.author.mention}!")
 
 
 @bot.command()
-async def modelo(ctx, numero):
+async def model(ctx, numero):
     try:
-        escolha = int(numero)
+        choice = int(numero)
 
-        if 1 <= escolha <= len(MODELOS):
-            await ctx.send(f"Modelo {escolha} selecionado: {MODELOS[escolha - 1]}")
+        if 1 <= choice <= len(MODELS):
+            await ctx.send(f"Model {choice} selected: {MODELS[choice - 1]['model']}, Value: {MODELS[choice - 1]['value']}")
         else:
-            await ctx.send("Número de modelo inválido!")
+            await ctx.send("Invalid model number!")
 
     except ValueError:
-        await ctx.send("Por favor, insira um número válido!")
-
-texto = ""
-contador = 1
-
-
-for modelo in MODELOS:
-    texto += f"{contador}. {modelo}\n"
-    contador += 1
+        await ctx.send("Please insert a valid number!")
 
 
 @bot.command()
-async def modelos(ctx):
-    await ctx.send(f"Modelos disponíveis:\n{texto}")
+async def models(ctx):
+    await ctx.send(f"Available models:\n{text}")
+
+
+
 
 bot.run(TOKEN)
